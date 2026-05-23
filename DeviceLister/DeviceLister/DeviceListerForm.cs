@@ -24,6 +24,17 @@ namespace DeviceLister
         private readonly List<string> preservedVisibleEntries = new List<string>();
         private readonly List<string> preservedAliasEntries = new List<string>();
         private string gameFolderPath;
+        private string gameExePath;
+        private TextBox gameExeTextBox;
+        private Label gameExeStatusLabel;
+        private Button browseExeButton;
+        private Button installGameButton;
+        private Button uninstallGameButton;
+        private ComboBox profileComboBox;
+        private TextBox profileNameTextBox;
+        private Button saveProfileButton;
+        private Button loadProfileButton;
+        private Button deleteProfileButton;
         private object identifyDevice;
         private DeviceEntry identifyEntry;
 
@@ -63,6 +74,121 @@ namespace DeviceLister
         public DeviceListerForm()
         {
             InitializeComponent();
+            InitializeExtendedFeatureUi();
+        }
+
+
+        private void InitializeExtendedFeatureUi()
+        {
+            targetGroupBox.Height = 168;
+            targetStatusLabel.Top = 140;
+            deviceListView.Top += 56;
+            deviceListView.Height -= 56;
+            previewGroupBox.Top += 56;
+            identifyGroupBox.Top += 56;
+            identifyGroupBox.Height -= 56;
+
+            Label gameExeLabel = new Label();
+            gameExeLabel.AutoSize = true;
+            gameExeLabel.Location = new Point(9, 84);
+            gameExeLabel.Name = "gameExeLabel";
+            gameExeLabel.Text = "Game .exe:";
+            targetGroupBox.Controls.Add(gameExeLabel);
+
+            gameExeTextBox = new TextBox();
+            gameExeTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            gameExeTextBox.Location = new Point(77, 81);
+            gameExeTextBox.Name = "gameExeTextBox";
+            gameExeTextBox.ReadOnly = true;
+            gameExeTextBox.Size = new Size(Math.Max(120, targetGroupBox.Width - 530), 20);
+            targetGroupBox.Controls.Add(gameExeTextBox);
+
+            browseExeButton = new Button();
+            browseExeButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            browseExeButton.Location = new Point(targetGroupBox.Width - 447, 79);
+            browseExeButton.Name = "browseExeButton";
+            browseExeButton.Size = new Size(80, 23);
+            browseExeButton.Text = "Pick EXE...";
+            browseExeButton.UseVisualStyleBackColor = true;
+            browseExeButton.Click += new EventHandler(browseExeButton_Click);
+            targetGroupBox.Controls.Add(browseExeButton);
+
+            installGameButton = new Button();
+            installGameButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            installGameButton.Location = new Point(targetGroupBox.Width - 361, 79);
+            installGameButton.Name = "installGameButton";
+            installGameButton.Size = new Size(126, 23);
+            installGameButton.Text = "Install for Game";
+            installGameButton.UseVisualStyleBackColor = true;
+            installGameButton.Click += new EventHandler(installGameButton_Click);
+            targetGroupBox.Controls.Add(installGameButton);
+
+            uninstallGameButton = new Button();
+            uninstallGameButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            uninstallGameButton.Location = new Point(targetGroupBox.Width - 229, 79);
+            uninstallGameButton.Name = "uninstallGameButton";
+            uninstallGameButton.Size = new Size(136, 23);
+            uninstallGameButton.Text = "Uninstall from Game";
+            uninstallGameButton.UseVisualStyleBackColor = true;
+            uninstallGameButton.Click += new EventHandler(uninstallGameButton_Click);
+            targetGroupBox.Controls.Add(uninstallGameButton);
+
+            gameExeStatusLabel = new Label();
+            gameExeStatusLabel.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            gameExeStatusLabel.Location = new Point(targetGroupBox.Width - 88, 84);
+            gameExeStatusLabel.Name = "gameExeStatusLabel";
+            gameExeStatusLabel.Size = new Size(82, 17);
+            gameExeStatusLabel.TextAlign = ContentAlignment.MiddleRight;
+            targetGroupBox.Controls.Add(gameExeStatusLabel);
+
+            Label profileLabel = new Label();
+            profileLabel.AutoSize = true;
+            profileLabel.Location = new Point(9, 114);
+            profileLabel.Name = "profileLabel";
+            profileLabel.Text = "Profile:";
+            targetGroupBox.Controls.Add(profileLabel);
+
+            profileComboBox = new ComboBox();
+            profileComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            profileComboBox.FormattingEnabled = true;
+            profileComboBox.Location = new Point(77, 110);
+            profileComboBox.Name = "profileComboBox";
+            profileComboBox.Size = new Size(170, 21);
+            profileComboBox.SelectedIndexChanged += new EventHandler(profileComboBox_SelectedIndexChanged);
+            targetGroupBox.Controls.Add(profileComboBox);
+
+            profileNameTextBox = new TextBox();
+            profileNameTextBox.Location = new Point(253, 110);
+            profileNameTextBox.Name = "profileNameTextBox";
+            profileNameTextBox.Size = new Size(170, 20);
+            targetGroupBox.Controls.Add(profileNameTextBox);
+
+            saveProfileButton = new Button();
+            saveProfileButton.Location = new Point(429, 108);
+            saveProfileButton.Name = "saveProfileButton";
+            saveProfileButton.Size = new Size(90, 23);
+            saveProfileButton.Text = "Save Profile";
+            saveProfileButton.UseVisualStyleBackColor = true;
+            saveProfileButton.Click += new EventHandler(saveProfileButton_Click);
+            targetGroupBox.Controls.Add(saveProfileButton);
+
+            loadProfileButton = new Button();
+            loadProfileButton.Location = new Point(525, 108);
+            loadProfileButton.Name = "loadProfileButton";
+            loadProfileButton.Size = new Size(90, 23);
+            loadProfileButton.Text = "Load Profile";
+            loadProfileButton.UseVisualStyleBackColor = true;
+            loadProfileButton.Click += new EventHandler(loadProfileButton_Click);
+            targetGroupBox.Controls.Add(loadProfileButton);
+
+            deleteProfileButton = new Button();
+            deleteProfileButton.Location = new Point(621, 108);
+            deleteProfileButton.Name = "deleteProfileButton";
+            deleteProfileButton.Size = new Size(90, 23);
+            deleteProfileButton.Text = "Delete Profile";
+            deleteProfileButton.UseVisualStyleBackColor = true;
+            deleteProfileButton.Click += new EventHandler(deleteProfileButton_Click);
+            targetGroupBox.Controls.Add(deleteProfileButton);
         }
 
         private void DeviceListerForm_Load(object sender, EventArgs e)
@@ -79,6 +205,7 @@ namespace DeviceLister
             targetComboBox.Items.Add("System-wide install");
             targetComboBox.SelectedIndex = TargetGameFolder;
 
+            RefreshProfileList();
             LoadDevices();
             UpdateTargetControls();
         }
@@ -106,6 +233,7 @@ namespace DeviceLister
             }
             finally
             {
+                ApplyStoredAliases();
                 RefreshOrderColumn();
                 deviceListView.EndUpdate();
                 UpdateSelectionControls();
@@ -195,7 +323,7 @@ namespace DeviceLister
 
         private int GetPreservedEntryCount()
         {
-            return preservedOrderEntries.Count + preservedHiddenEntries.Count + preservedVisibleEntries.Count + preservedAliasEntries.Count;
+            return preservedOrderEntries.Count + preservedHiddenEntries.Count + preservedVisibleEntries.Count;
         }
 
         private DeviceEntry GetEntry(ListViewItem item)
@@ -234,11 +362,6 @@ namespace DeviceLister
 
         private string GetGameFolderPath()
         {
-            if (targetComboBox.SelectedIndex == TargetGameFolder)
-            {
-                gameFolderPath = targetPathTextBox.Text.Trim();
-            }
-
             return String.IsNullOrEmpty(gameFolderPath) ? Application.StartupPath : gameFolderPath;
         }
 
@@ -249,6 +372,12 @@ namespace DeviceLister
             targetPathTextBox.ReadOnly = !gameFolderSelected;
             browseFolderButton.Enabled = gameFolderSelected;
             targetPathTextBox.Text = gameFolderSelected ? GetGameFolderPath() : GetCommonConfigPath();
+            if (installGameButton != null)
+            {
+                browseExeButton.Enabled = gameFolderSelected;
+                installGameButton.Enabled = gameFolderSelected;
+                uninstallGameButton.Enabled = gameFolderSelected;
+            }
             UpdateConfigStatus();
         }
 
@@ -268,7 +397,8 @@ namespace DeviceLister
                 string folderStatus = Directory.Exists(folderPath) ? "folder present" : "folder missing";
                 string dllPath = Path.Combine(folderPath, "dinput8.dll");
                 string dllStatus = File.Exists(dllPath) ? "local dinput8.dll present" : "local dinput8.dll missing";
-                targetStatusLabel.Text = folderStatus + "; " + configStatus + "; " + dllStatus + " - " + configPath;
+                string exeStatus = GetGameExecutableStatus();
+                targetStatusLabel.Text = folderStatus + "; " + configStatus + "; " + dllStatus + exeStatus + " - " + configPath;
             }
             else if (targetComboBox.SelectedIndex == TargetAllPrograms)
             {
@@ -278,6 +408,25 @@ namespace DeviceLister
             {
                 targetStatusLabel.Text = configStatus + "; " + GetSystemInstallStatus() + " - " + configPath;
             }
+        }
+
+
+        private string GetGameExecutableStatus()
+        {
+            if (gameExeStatusLabel == null)
+            {
+                return String.Empty;
+            }
+
+            if (String.IsNullOrEmpty(gameExePath) || !File.Exists(gameExePath))
+            {
+                gameExeStatusLabel.Text = "no EXE";
+                return "; no game EXE selected";
+            }
+
+            ExecutableBitness bitness = DetectExecutableBitness(gameExePath);
+            gameExeStatusLabel.Text = FormatBitness(bitness);
+            return "; game EXE " + FormatBitness(bitness);
         }
 
         private string GetSystemInstallStatus()
@@ -318,6 +467,266 @@ namespace DeviceLister
             }
 
             return label + " missing dinput8.dll";
+        }
+
+
+        private string GetSettingsDirectory()
+        {
+            return Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "devreorder"), "DeviceLister");
+        }
+
+        private string GetAliasStorePath()
+        {
+            return Path.Combine(GetSettingsDirectory(), "aliases.ini");
+        }
+
+        private string GetProfilesDirectory()
+        {
+            return Path.Combine(GetSettingsDirectory(), "profiles");
+        }
+
+        private string GetStableIdentifier(DeviceEntry entry)
+        {
+            return entry.HasDeviceInstanceId ? "<" + entry.DeviceInstanceId + ">" : entry.FormattedGuid;
+        }
+
+        private void ApplyStoredAliases()
+        {
+            Dictionary<string, string> aliases = ReadAliasStore();
+
+            foreach (ListViewItem item in deviceListView.Items)
+            {
+                DeviceEntry entry = GetEntry(item);
+                string alias;
+                if (!aliases.TryGetValue(GetStableIdentifier(entry), out alias) && !aliases.TryGetValue(entry.FormattedGuid, out alias))
+                {
+                    aliases.TryGetValue(entry.ProductName, out alias);
+                }
+
+                entry.Alias = alias == null ? String.Empty : alias;
+                UpdateItemDisplay(item);
+            }
+        }
+
+        private Dictionary<string, string> ReadAliasStore()
+        {
+            Dictionary<string, string> aliases = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            string path = GetAliasStorePath();
+
+            if (!File.Exists(path))
+            {
+                return aliases;
+            }
+
+            foreach (string rawLine in File.ReadAllLines(path))
+            {
+                string line = rawLine.Trim();
+                if (line.Length == 0 || line.StartsWith(";") || line.StartsWith("["))
+                {
+                    continue;
+                }
+
+                int equalsIndex = line.IndexOf('=');
+                if (equalsIndex <= 0)
+                {
+                    continue;
+                }
+
+                aliases[line.Substring(0, equalsIndex).Trim()] = line.Substring(equalsIndex + 1).Trim();
+            }
+
+            return aliases;
+        }
+
+        private void SaveAliasStore()
+        {
+            Directory.CreateDirectory(GetSettingsDirectory());
+            StringBuilder builder = new StringBuilder();
+            builder.AppendLine("; DeviceLister aliases. These labels do not change DirectInput device names.");
+            builder.AppendLine("[aliases]");
+
+            foreach (ListViewItem item in deviceListView.Items)
+            {
+                DeviceEntry entry = GetEntry(item);
+                if (!String.IsNullOrEmpty(entry.Alias))
+                {
+                    builder.AppendLine(GetStableIdentifier(entry) + "=" + entry.Alias.Trim());
+                }
+            }
+
+            AppendPreservedEntries(builder, preservedAliasEntries);
+            File.WriteAllText(GetAliasStorePath(), builder.ToString(), Encoding.UTF8);
+        }
+
+        private void RefreshProfileList()
+        {
+            if (profileComboBox == null)
+            {
+                return;
+            }
+
+            string selectedProfile = profileComboBox.SelectedItem as string;
+            profileComboBox.Items.Clear();
+
+            string profilesDirectory = GetProfilesDirectory();
+            if (Directory.Exists(profilesDirectory))
+            {
+                foreach (string profilePath in Directory.GetFiles(profilesDirectory, "*.ini"))
+                {
+                    profileComboBox.Items.Add(Path.GetFileNameWithoutExtension(profilePath));
+                }
+            }
+
+            if (!String.IsNullOrEmpty(selectedProfile) && profileComboBox.Items.Contains(selectedProfile))
+            {
+                profileComboBox.SelectedItem = selectedProfile;
+            }
+            else if (profileComboBox.Items.Count > 0)
+            {
+                profileComboBox.SelectedIndex = 0;
+            }
+        }
+
+        private string GetSelectedProfileName()
+        {
+            string profileName = profileNameTextBox.Text.Trim();
+            if (profileName.Length == 0 && profileComboBox.SelectedItem != null)
+            {
+                profileName = profileComboBox.SelectedItem.ToString();
+            }
+
+            return profileName;
+        }
+
+        private string SanitizeProfileName(string profileName)
+        {
+            foreach (char invalidChar in Path.GetInvalidFileNameChars())
+            {
+                profileName = profileName.Replace(invalidChar, '_');
+            }
+
+            return profileName.Trim();
+        }
+
+        private string GetProfilePath(string profileName)
+        {
+            return Path.Combine(GetProfilesDirectory(), SanitizeProfileName(profileName) + ".ini");
+        }
+
+        private enum ExecutableBitness
+        {
+            Unknown,
+            X86,
+            X64
+        }
+
+        private ExecutableBitness DetectExecutableBitness(string executablePath)
+        {
+            using (BinaryReader reader = new BinaryReader(File.OpenRead(executablePath)))
+            {
+                if (reader.ReadUInt16() != 0x5A4D)
+                {
+                    return ExecutableBitness.Unknown;
+                }
+
+                reader.BaseStream.Seek(0x3C, SeekOrigin.Begin);
+                int peOffset = reader.ReadInt32();
+                reader.BaseStream.Seek(peOffset, SeekOrigin.Begin);
+                if (reader.ReadUInt32() != 0x00004550)
+                {
+                    return ExecutableBitness.Unknown;
+                }
+
+                ushort machine = reader.ReadUInt16();
+                if (machine == 0x014C)
+                {
+                    return ExecutableBitness.X86;
+                }
+
+                if (machine == 0x8664)
+                {
+                    return ExecutableBitness.X64;
+                }
+            }
+
+            return ExecutableBitness.Unknown;
+        }
+
+        private string FormatBitness(ExecutableBitness bitness)
+        {
+            if (bitness == ExecutableBitness.X86)
+            {
+                return "x86";
+            }
+
+            if (bitness == ExecutableBitness.X64)
+            {
+                return "x64";
+            }
+
+            return "unknown";
+        }
+
+        private string FindWrapperDllPath(ExecutableBitness bitness)
+        {
+            if (bitness == ExecutableBitness.Unknown)
+            {
+                return null;
+            }
+
+            string relativePath = Path.Combine(FormatBitness(bitness), "dinput8.dll");
+            DirectoryInfo directory = new DirectoryInfo(Application.StartupPath);
+
+            while (directory != null)
+            {
+                string directPath = Path.Combine(directory.FullName, relativePath);
+                if (File.Exists(directPath))
+                {
+                    return directPath;
+                }
+
+                string releasePath = Path.Combine(Path.Combine(directory.FullName, "release"), relativePath);
+                if (File.Exists(releasePath))
+                {
+                    return releasePath;
+                }
+
+                directory = directory.Parent;
+            }
+
+            return null;
+        }
+
+        private bool FilesAreEqual(string firstPath, string secondPath)
+        {
+            FileInfo first = new FileInfo(firstPath);
+            FileInfo second = new FileInfo(secondPath);
+            if (first.Length != second.Length)
+            {
+                return false;
+            }
+
+            byte[] firstBytes = File.ReadAllBytes(firstPath);
+            byte[] secondBytes = File.ReadAllBytes(secondPath);
+            for (int i = 0; i < firstBytes.Length; ++i)
+            {
+                if (firstBytes[i] != secondBytes[i])
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private void SetGameExecutable(string executablePath)
+        {
+            gameExePath = executablePath;
+            gameExeTextBox.Text = executablePath;
+            targetComboBox.SelectedIndex = TargetGameFolder;
+            gameFolderPath = Path.GetDirectoryName(executablePath);
+            targetPathTextBox.Text = gameFolderPath;
+            UpdateConfigStatus();
         }
 
         private void MoveSelectedItem(int direction)
@@ -363,7 +772,6 @@ namespace DeviceLister
 
             builder.AppendLine("; devreorder settings generated by DeviceLister");
             builder.AppendLine("; Drag devices in DeviceLister to change [order]; hide devices with [hidden] or [visible].");
-            builder.AppendLine("; Device aliases are only used by DeviceLister and do not rename DirectInput devices in-game.");
             builder.AppendLine();
             builder.AppendLine("[order]");
 
@@ -421,18 +829,6 @@ namespace DeviceLister
             builder.AppendLine("[ignored processes]");
             AppendTextBoxLines(builder, ignoredProcessesTextBox);
 
-            builder.AppendLine();
-            builder.AppendLine("[aliases]");
-            builder.AppendLine("; Optional DeviceLister-only labels in the form <identifier>=Friendly Name.");
-            foreach (ListViewItem item in deviceListView.Items)
-            {
-                DeviceEntry entry = GetEntry(item);
-                if (!String.IsNullOrEmpty(entry.Alias))
-                {
-                    builder.AppendLine(GetIdentifier(entry) + "=" + entry.Alias.Trim());
-                }
-            }
-            AppendPreservedEntries(builder, preservedAliasEntries);
 
             return builder.ToString();
         }
@@ -548,15 +944,20 @@ namespace DeviceLister
 
             foreach (ListViewItem item in deviceListView.Items)
             {
-                DeviceEntry entry = GetEntry(item);
-                entry.Alias = String.Empty;
-                UpdateItemDisplay(item);
                 item.Checked = true;
             }
 
             ApplyOrder(config.Order);
             ApplyVisibility(config);
-            ApplyAliases(config);
+            if (config.AliasLines.Count > 0)
+            {
+                ApplyAliases(config);
+                SaveAliasStore();
+            }
+            else
+            {
+                ApplyStoredAliases();
+            }
             ignoredProcessesTextBox.Text = String.Join(Environment.NewLine, config.IgnoredProcesses.ToArray());
 
             RefreshOrderColumn();
@@ -739,6 +1140,21 @@ namespace DeviceLister
             item.SubItems[2].Text = entry.DisplayName;
         }
 
+
+        private int CountProductNameOccurrences(string productName)
+        {
+            int count = 0;
+            foreach (ListViewItem item in deviceListView.Items)
+            {
+                if (String.Equals(GetEntry(item).ProductName, productName, StringComparison.Ordinal))
+                {
+                    ++count;
+                }
+            }
+
+            return count;
+        }
+
         private void UpdateSelectionControls()
         {
             bool hasSelection = deviceListView.SelectedItems.Count > 0;
@@ -755,7 +1171,14 @@ namespace DeviceLister
 
             DeviceEntry entry = GetEntry(deviceListView.SelectedItems[0]);
             aliasTextBox.Text = entry.Alias;
-            identifyStatusLabel.Text = "Identifying " + entry.DisplayName;
+            if (CountProductNameOccurrences(entry.ProductName) > 1)
+            {
+                identifyStatusLabel.Text = "Duplicate name: press input, then assign a unique alias.";
+            }
+            else
+            {
+                identifyStatusLabel.Text = "Identifying " + entry.DisplayName;
+            }
         }
 
         private void UpdateEffectiveOrderPreview()
@@ -818,7 +1241,14 @@ namespace DeviceLister
                 TrySetCooperativeLevel(directInputAssembly, identifyDevice);
                 TryInvoke(identifyDevice, "Acquire");
                 identifyTimer.Start();
-                identifyStatusLabel.Text = "Press buttons or move axes on " + identifyEntry.DisplayName;
+                if (CountProductNameOccurrences(identifyEntry.ProductName) > 1)
+                {
+                    identifyStatusLabel.Text = "Press buttons on the physical device, then Apply Alias.";
+                }
+                else
+                {
+                    identifyStatusLabel.Text = "Press buttons or move axes on " + identifyEntry.DisplayName;
+                }
             }
             catch (Exception ex)
             {
@@ -1203,8 +1633,217 @@ namespace DeviceLister
             DeviceEntry entry = GetEntry(item);
             entry.Alias = aliasTextBox.Text.Trim();
             UpdateItemDisplay(item);
+            SaveAliasStore();
             UpdateStatus();
             UpdateSelectionControls();
+        }
+
+
+        private void browseExeButton_Click(object sender, EventArgs e)
+        {
+            using (OpenFileDialog dialog = new OpenFileDialog())
+            {
+                dialog.CheckFileExists = true;
+                dialog.DefaultExt = "exe";
+                dialog.Filter = "Executable files (*.exe)|*.exe|All files (*.*)|*.*";
+                dialog.InitialDirectory = Directory.Exists(GetGameFolderPath()) ? GetGameFolderPath() : Application.StartupPath;
+                dialog.Title = "Select game executable";
+
+                if (dialog.ShowDialog(this) != DialogResult.OK)
+                {
+                    return;
+                }
+
+                SetGameExecutable(dialog.FileName);
+            }
+        }
+
+        private void installGameButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (String.IsNullOrEmpty(gameExePath) || !File.Exists(gameExePath))
+                {
+                    browseExeButton_Click(sender, e);
+                    if (String.IsNullOrEmpty(gameExePath) || !File.Exists(gameExePath))
+                    {
+                        return;
+                    }
+                }
+
+                ExecutableBitness bitness = DetectExecutableBitness(gameExePath);
+                if (bitness == ExecutableBitness.Unknown)
+                {
+                    MessageBox.Show(this,
+                        "Unable to determine whether the selected executable is x86 or x64.",
+                        "DeviceLister",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                    return;
+                }
+
+                string sourceDll = FindWrapperDllPath(bitness);
+                if (sourceDll == null)
+                {
+                    MessageBox.Show(this,
+                        "Unable to find the " + FormatBitness(bitness) + " devreorder dinput8.dll. Expected it under an x86 or x64 release folder near DeviceLister.",
+                        "DeviceLister",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                    return;
+                }
+
+                string gameFolder = Path.GetDirectoryName(gameExePath);
+                string targetDll = Path.Combine(gameFolder, "dinput8.dll");
+                string backupDll = Path.Combine(gameFolder, "dinput8.dll.devreorder-backup");
+
+                if (File.Exists(targetDll) && !FilesAreEqual(targetDll, sourceDll))
+                {
+                    if (!File.Exists(backupDll))
+                    {
+                        File.Copy(targetDll, backupDll);
+                    }
+                    else
+                    {
+                        File.Copy(targetDll, Path.Combine(gameFolder, "dinput8.dll.devreorder-backup-" + DateTime.Now.ToString("yyyyMMddHHmmss")));
+                    }
+                }
+
+                File.Copy(sourceDll, targetDll, true);
+                SaveConfigToPath(Path.Combine(gameFolder, "devreorder.ini"));
+                statusLabel.Text = "Installed " + FormatBitness(bitness) + " devreorder for " + Path.GetFileName(gameExePath);
+                UpdateConfigStatus();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(this,
+                    "Unable to install devreorder for this game." + Environment.NewLine + Environment.NewLine + ex.Message,
+                    "DeviceLister",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+        }
+
+        private void uninstallGameButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string gameFolder = GetGameFolderPath();
+                string targetDll = Path.Combine(gameFolder, "dinput8.dll");
+                string backupDll = Path.Combine(gameFolder, "dinput8.dll.devreorder-backup");
+
+                if (!File.Exists(targetDll))
+                {
+                    statusLabel.Text = "No local dinput8.dll found in " + gameFolder;
+                    UpdateConfigStatus();
+                    return;
+                }
+
+                bool knownDevreorderDll = false;
+                string x86Dll = FindWrapperDllPath(ExecutableBitness.X86);
+                string x64Dll = FindWrapperDllPath(ExecutableBitness.X64);
+                if (x86Dll != null && FilesAreEqual(targetDll, x86Dll))
+                {
+                    knownDevreorderDll = true;
+                }
+                if (x64Dll != null && FilesAreEqual(targetDll, x64Dll))
+                {
+                    knownDevreorderDll = true;
+                }
+
+                if (!knownDevreorderDll)
+                {
+                    MessageBox.Show(this,
+                        "The local dinput8.dll does not match the bundled devreorder DLLs, so it was left untouched.",
+                        "DeviceLister",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                    return;
+                }
+
+                File.Delete(targetDll);
+                if (File.Exists(backupDll))
+                {
+                    File.Move(backupDll, targetDll);
+                    statusLabel.Text = "Removed devreorder and restored previous dinput8.dll";
+                }
+                else
+                {
+                    statusLabel.Text = "Removed devreorder dinput8.dll";
+                }
+
+                UpdateConfigStatus();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(this,
+                    "Unable to uninstall devreorder from this game." + Environment.NewLine + Environment.NewLine + ex.Message,
+                    "DeviceLister",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+        }
+
+        private void saveProfileButton_Click(object sender, EventArgs e)
+        {
+            string profileName = GetSelectedProfileName();
+            if (profileName.Length == 0)
+            {
+                MessageBox.Show(this, "Enter a profile name first.", "DeviceLister", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            Directory.CreateDirectory(GetProfilesDirectory());
+            File.WriteAllText(GetProfilePath(profileName), BuildIni(), Encoding.UTF8);
+            RefreshProfileList();
+            profileComboBox.SelectedItem = SanitizeProfileName(profileName);
+            statusLabel.Text = "Saved profile " + profileName;
+        }
+
+        private void loadProfileButton_Click(object sender, EventArgs e)
+        {
+            string profileName = GetSelectedProfileName();
+            if (profileName.Length == 0)
+            {
+                return;
+            }
+
+            string profilePath = GetProfilePath(profileName);
+            if (!File.Exists(profilePath))
+            {
+                MessageBox.Show(this, "Profile not found: " + profileName, "DeviceLister", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            ApplyConfig(ReadIni(profilePath));
+            statusLabel.Text = "Loaded profile " + profileName;
+        }
+
+        private void deleteProfileButton_Click(object sender, EventArgs e)
+        {
+            string profileName = GetSelectedProfileName();
+            if (profileName.Length == 0)
+            {
+                return;
+            }
+
+            string profilePath = GetProfilePath(profileName);
+            if (File.Exists(profilePath))
+            {
+                File.Delete(profilePath);
+            }
+
+            profileNameTextBox.Text = String.Empty;
+            RefreshProfileList();
+            statusLabel.Text = "Deleted profile " + profileName;
+        }
+
+        private void profileComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (profileComboBox.SelectedItem != null)
+            {
+                profileNameTextBox.Text = profileComboBox.SelectedItem.ToString();
+            }
         }
 
         private void targetComboBox_SelectedIndexChanged(object sender, EventArgs e)
