@@ -28,8 +28,10 @@ namespace DeviceLister
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.instructionsLabel = new System.Windows.Forms.Label();
             this.targetGroupBox = new System.Windows.Forms.GroupBox();
+            this.importConfigButton = new System.Windows.Forms.Button();
             this.refreshStatusButton = new System.Windows.Forms.Button();
             this.saveAsButton = new System.Windows.Forms.Button();
             this.saveTargetButton = new System.Windows.Forms.Button();
@@ -43,11 +45,20 @@ namespace DeviceLister
             this.deviceListView = new System.Windows.Forms.ListView();
             this.orderColumnHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.nameColumnHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.aliasColumnHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.guidColumnHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.deviceInstanceIdColumnHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.previewGroupBox = new System.Windows.Forms.GroupBox();
+            this.effectiveOrderListBox = new System.Windows.Forms.ListBox();
+            this.identifyGroupBox = new System.Windows.Forms.GroupBox();
+            this.identifyTextBox = new System.Windows.Forms.TextBox();
+            this.identifyStatusLabel = new System.Windows.Forms.Label();
             this.identifierLabel = new System.Windows.Forms.Label();
             this.identifierComboBox = new System.Windows.Forms.ComboBox();
             this.visibleWhitelistCheckBox = new System.Windows.Forms.CheckBox();
+            this.aliasLabel = new System.Windows.Forms.Label();
+            this.aliasTextBox = new System.Windows.Forms.TextBox();
+            this.renameButton = new System.Windows.Forms.Button();
             this.ignoredProcessesLabel = new System.Windows.Forms.Label();
             this.ignoredProcessesTextBox = new System.Windows.Forms.TextBox();
             this.moveUpButton = new System.Windows.Forms.Button();
@@ -58,7 +69,10 @@ namespace DeviceLister
             this.refreshButton = new System.Windows.Forms.Button();
             this.copyButton = new System.Windows.Forms.Button();
             this.statusLabel = new System.Windows.Forms.Label();
+            this.identifyTimer = new System.Windows.Forms.Timer(this.components);
             this.targetGroupBox.SuspendLayout();
+            this.previewGroupBox.SuspendLayout();
+            this.identifyGroupBox.SuspendLayout();
             this.SuspendLayout();
             //
             // instructionsLabel
@@ -67,14 +81,15 @@ namespace DeviceLister
             | System.Windows.Forms.AnchorStyles.Right)));
             this.instructionsLabel.Location = new System.Drawing.Point(12, 9);
             this.instructionsLabel.Name = "instructionsLabel";
-            this.instructionsLabel.Size = new System.Drawing.Size(916, 34);
+            this.instructionsLabel.Size = new System.Drawing.Size(1016, 34);
             this.instructionsLabel.TabIndex = 0;
-            this.instructionsLabel.Text = "Check devices that should remain visible, uncheck devices to hide them, then drag rows or use Move Up/Down to set the DirectInput order. Choose a target to load or save that devreorder.ini.";
+            this.instructionsLabel.Text = "Check devices that should remain visible, uncheck devices to hide them, then drag rows or use Move Up/Down to set the DirectInput order. Choose a target to load, import, or save that devreorder.ini.";
             //
             // targetGroupBox
             //
             this.targetGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.targetGroupBox.Controls.Add(this.importConfigButton);
             this.targetGroupBox.Controls.Add(this.refreshStatusButton);
             this.targetGroupBox.Controls.Add(this.saveAsButton);
             this.targetGroupBox.Controls.Add(this.saveTargetButton);
@@ -87,15 +102,25 @@ namespace DeviceLister
             this.targetGroupBox.Controls.Add(this.targetLabel);
             this.targetGroupBox.Location = new System.Drawing.Point(12, 46);
             this.targetGroupBox.Name = "targetGroupBox";
-            this.targetGroupBox.Size = new System.Drawing.Size(916, 112);
+            this.targetGroupBox.Size = new System.Drawing.Size(1016, 112);
             this.targetGroupBox.TabIndex = 1;
             this.targetGroupBox.TabStop = false;
             this.targetGroupBox.Text = "Configuration target";
             //
+            // importConfigButton
+            //
+            this.importConfigButton.Location = new System.Drawing.Point(342, 52);
+            this.importConfigButton.Name = "importConfigButton";
+            this.importConfigButton.Size = new System.Drawing.Size(88, 23);
+            this.importConfigButton.TabIndex = 10;
+            this.importConfigButton.Text = "Import...";
+            this.importConfigButton.UseVisualStyleBackColor = true;
+            this.importConfigButton.Click += new System.EventHandler(this.importConfigButton_Click);
+            //
             // refreshStatusButton
             //
             this.refreshStatusButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.refreshStatusButton.Location = new System.Drawing.Point(819, 18);
+            this.refreshStatusButton.Location = new System.Drawing.Point(925, 18);
             this.refreshStatusButton.Name = "refreshStatusButton";
             this.refreshStatusButton.Size = new System.Drawing.Size(85, 23);
             this.refreshStatusButton.TabIndex = 9;
@@ -139,13 +164,13 @@ namespace DeviceLister
             | System.Windows.Forms.AnchorStyles.Right)));
             this.targetStatusLabel.Location = new System.Drawing.Point(9, 80);
             this.targetStatusLabel.Name = "targetStatusLabel";
-            this.targetStatusLabel.Size = new System.Drawing.Size(895, 25);
+            this.targetStatusLabel.Size = new System.Drawing.Size(1001, 25);
             this.targetStatusLabel.TabIndex = 5;
             //
             // browseFolderButton
             //
             this.browseFolderButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.browseFolderButton.Location = new System.Drawing.Point(738, 18);
+            this.browseFolderButton.Location = new System.Drawing.Point(844, 18);
             this.browseFolderButton.Name = "browseFolderButton";
             this.browseFolderButton.Size = new System.Drawing.Size(75, 23);
             this.browseFolderButton.TabIndex = 4;
@@ -159,7 +184,7 @@ namespace DeviceLister
             | System.Windows.Forms.AnchorStyles.Right)));
             this.targetPathTextBox.Location = new System.Drawing.Point(353, 20);
             this.targetPathTextBox.Name = "targetPathTextBox";
-            this.targetPathTextBox.Size = new System.Drawing.Size(379, 20);
+            this.targetPathTextBox.Size = new System.Drawing.Size(485, 20);
             this.targetPathTextBox.TabIndex = 3;
             this.targetPathTextBox.Leave += new System.EventHandler(this.targetPathTextBox_Leave);
             //
@@ -201,6 +226,7 @@ namespace DeviceLister
             this.deviceListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.orderColumnHeader,
             this.nameColumnHeader,
+            this.aliasColumnHeader,
             this.guidColumnHeader,
             this.deviceInstanceIdColumnHeader});
             this.deviceListView.FullRowSelect = true;
@@ -209,11 +235,12 @@ namespace DeviceLister
             this.deviceListView.Location = new System.Drawing.Point(12, 164);
             this.deviceListView.MultiSelect = false;
             this.deviceListView.Name = "deviceListView";
-            this.deviceListView.Size = new System.Drawing.Size(916, 274);
+            this.deviceListView.Size = new System.Drawing.Size(704, 274);
             this.deviceListView.TabIndex = 2;
             this.deviceListView.UseCompatibleStateImageBehavior = false;
             this.deviceListView.View = System.Windows.Forms.View.Details;
             this.deviceListView.ItemChecked += new System.Windows.Forms.ItemCheckedEventHandler(this.deviceListView_ItemChecked);
+            this.deviceListView.SelectedIndexChanged += new System.EventHandler(this.deviceListView_SelectedIndexChanged);
             this.deviceListView.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.deviceListView_ItemDrag);
             this.deviceListView.DragDrop += new System.Windows.Forms.DragEventHandler(this.deviceListView_DragDrop);
             this.deviceListView.DragEnter += new System.Windows.Forms.DragEventHandler(this.deviceListView_DragEnter);
@@ -222,22 +249,86 @@ namespace DeviceLister
             // orderColumnHeader
             //
             this.orderColumnHeader.Text = "#";
-            this.orderColumnHeader.Width = 48;
+            this.orderColumnHeader.Width = 40;
             //
             // nameColumnHeader
             //
             this.nameColumnHeader.Text = "Device";
-            this.nameColumnHeader.Width = 250;
+            this.nameColumnHeader.Width = 180;
+            //
+            // aliasColumnHeader
+            //
+            this.aliasColumnHeader.Text = "Alias";
+            this.aliasColumnHeader.Width = 145;
             //
             // guidColumnHeader
             //
             this.guidColumnHeader.Text = "Instance GUID";
-            this.guidColumnHeader.Width = 245;
+            this.guidColumnHeader.Width = 225;
             //
             // deviceInstanceIdColumnHeader
             //
             this.deviceInstanceIdColumnHeader.Text = "Device Instance ID";
-            this.deviceInstanceIdColumnHeader.Width = 420;
+            this.deviceInstanceIdColumnHeader.Width = 380;
+            //
+            // previewGroupBox
+            //
+            this.previewGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.previewGroupBox.Controls.Add(this.effectiveOrderListBox);
+            this.previewGroupBox.Location = new System.Drawing.Point(722, 164);
+            this.previewGroupBox.Name = "previewGroupBox";
+            this.previewGroupBox.Size = new System.Drawing.Size(306, 132);
+            this.previewGroupBox.TabIndex = 3;
+            this.previewGroupBox.TabStop = false;
+            this.previewGroupBox.Text = "Effective visible order";
+            //
+            // effectiveOrderListBox
+            //
+            this.effectiveOrderListBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.effectiveOrderListBox.FormattingEnabled = true;
+            this.effectiveOrderListBox.Location = new System.Drawing.Point(8, 19);
+            this.effectiveOrderListBox.Name = "effectiveOrderListBox";
+            this.effectiveOrderListBox.Size = new System.Drawing.Size(292, 95);
+            this.effectiveOrderListBox.TabIndex = 0;
+            //
+            // identifyGroupBox
+            //
+            this.identifyGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.identifyGroupBox.Controls.Add(this.identifyTextBox);
+            this.identifyGroupBox.Controls.Add(this.identifyStatusLabel);
+            this.identifyGroupBox.Location = new System.Drawing.Point(722, 302);
+            this.identifyGroupBox.Name = "identifyGroupBox";
+            this.identifyGroupBox.Size = new System.Drawing.Size(306, 136);
+            this.identifyGroupBox.TabIndex = 4;
+            this.identifyGroupBox.TabStop = false;
+            this.identifyGroupBox.Text = "Identify selected device";
+            //
+            // identifyTextBox
+            //
+            this.identifyTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.identifyTextBox.Location = new System.Drawing.Point(8, 42);
+            this.identifyTextBox.Multiline = true;
+            this.identifyTextBox.Name = "identifyTextBox";
+            this.identifyTextBox.ReadOnly = true;
+            this.identifyTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.identifyTextBox.Size = new System.Drawing.Size(292, 88);
+            this.identifyTextBox.TabIndex = 1;
+            this.identifyTextBox.WordWrap = false;
+            //
+            // identifyStatusLabel
+            //
+            this.identifyStatusLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.identifyStatusLabel.Location = new System.Drawing.Point(8, 20);
+            this.identifyStatusLabel.Name = "identifyStatusLabel";
+            this.identifyStatusLabel.Size = new System.Drawing.Size(292, 19);
+            this.identifyStatusLabel.TabIndex = 0;
+            this.identifyStatusLabel.Text = "Select a device to identify it.";
             //
             // identifierLabel
             //
@@ -246,7 +337,7 @@ namespace DeviceLister
             this.identifierLabel.Location = new System.Drawing.Point(12, 450);
             this.identifierLabel.Name = "identifierLabel";
             this.identifierLabel.Size = new System.Drawing.Size(96, 13);
-            this.identifierLabel.TabIndex = 3;
+            this.identifierLabel.TabIndex = 5;
             this.identifierLabel.Text = "Identifier to save:";
             //
             // identifierComboBox
@@ -257,7 +348,7 @@ namespace DeviceLister
             this.identifierComboBox.Location = new System.Drawing.Point(114, 447);
             this.identifierComboBox.Name = "identifierComboBox";
             this.identifierComboBox.Size = new System.Drawing.Size(214, 21);
-            this.identifierComboBox.TabIndex = 4;
+            this.identifierComboBox.TabIndex = 6;
             this.identifierComboBox.SelectedIndexChanged += new System.EventHandler(this.identifierComboBox_SelectedIndexChanged);
             //
             // visibleWhitelistCheckBox
@@ -267,40 +358,70 @@ namespace DeviceLister
             this.visibleWhitelistCheckBox.Location = new System.Drawing.Point(350, 449);
             this.visibleWhitelistCheckBox.Name = "visibleWhitelistCheckBox";
             this.visibleWhitelistCheckBox.Size = new System.Drawing.Size(191, 17);
-            this.visibleWhitelistCheckBox.TabIndex = 5;
+            this.visibleWhitelistCheckBox.TabIndex = 7;
             this.visibleWhitelistCheckBox.Text = "Use [visible] whitelist when saving";
             this.visibleWhitelistCheckBox.UseVisualStyleBackColor = true;
             this.visibleWhitelistCheckBox.CheckedChanged += new System.EventHandler(this.visibleWhitelistCheckBox_CheckedChanged);
+            //
+            // aliasLabel
+            //
+            this.aliasLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.aliasLabel.AutoSize = true;
+            this.aliasLabel.Location = new System.Drawing.Point(12, 480);
+            this.aliasLabel.Name = "aliasLabel";
+            this.aliasLabel.Size = new System.Drawing.Size(109, 13);
+            this.aliasLabel.TabIndex = 8;
+            this.aliasLabel.Text = "Selected device alias:";
+            //
+            // aliasTextBox
+            //
+            this.aliasTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.aliasTextBox.Location = new System.Drawing.Point(127, 477);
+            this.aliasTextBox.Name = "aliasTextBox";
+            this.aliasTextBox.Size = new System.Drawing.Size(490, 20);
+            this.aliasTextBox.TabIndex = 9;
+            //
+            // renameButton
+            //
+            this.renameButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.renameButton.Location = new System.Drawing.Point(623, 475);
+            this.renameButton.Name = "renameButton";
+            this.renameButton.Size = new System.Drawing.Size(93, 23);
+            this.renameButton.TabIndex = 10;
+            this.renameButton.Text = "Apply Alias";
+            this.renameButton.UseVisualStyleBackColor = true;
+            this.renameButton.Click += new System.EventHandler(this.renameButton_Click);
             //
             // ignoredProcessesLabel
             //
             this.ignoredProcessesLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.ignoredProcessesLabel.AutoSize = true;
-            this.ignoredProcessesLabel.Location = new System.Drawing.Point(12, 480);
+            this.ignoredProcessesLabel.Location = new System.Drawing.Point(12, 511);
             this.ignoredProcessesLabel.Name = "ignoredProcessesLabel";
             this.ignoredProcessesLabel.Size = new System.Drawing.Size(172, 13);
-            this.ignoredProcessesLabel.TabIndex = 6;
+            this.ignoredProcessesLabel.TabIndex = 11;
             this.ignoredProcessesLabel.Text = "Ignored processes (one .exe/line):";
             //
             // ignoredProcessesTextBox
             //
             this.ignoredProcessesTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.ignoredProcessesTextBox.Location = new System.Drawing.Point(190, 477);
+            this.ignoredProcessesTextBox.Location = new System.Drawing.Point(190, 508);
             this.ignoredProcessesTextBox.Multiline = true;
             this.ignoredProcessesTextBox.Name = "ignoredProcessesTextBox";
             this.ignoredProcessesTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.ignoredProcessesTextBox.Size = new System.Drawing.Size(738, 51);
-            this.ignoredProcessesTextBox.TabIndex = 7;
+            this.ignoredProcessesTextBox.Size = new System.Drawing.Size(838, 51);
+            this.ignoredProcessesTextBox.TabIndex = 12;
             this.ignoredProcessesTextBox.WordWrap = false;
             //
             // moveUpButton
             //
             this.moveUpButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.moveUpButton.Location = new System.Drawing.Point(12, 575);
+            this.moveUpButton.Location = new System.Drawing.Point(12, 605);
             this.moveUpButton.Name = "moveUpButton";
             this.moveUpButton.Size = new System.Drawing.Size(75, 23);
-            this.moveUpButton.TabIndex = 8;
+            this.moveUpButton.TabIndex = 13;
             this.moveUpButton.Text = "Move Up";
             this.moveUpButton.UseVisualStyleBackColor = true;
             this.moveUpButton.Click += new System.EventHandler(this.moveUpButton_Click);
@@ -308,10 +429,10 @@ namespace DeviceLister
             // moveDownButton
             //
             this.moveDownButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.moveDownButton.Location = new System.Drawing.Point(93, 575);
+            this.moveDownButton.Location = new System.Drawing.Point(93, 605);
             this.moveDownButton.Name = "moveDownButton";
             this.moveDownButton.Size = new System.Drawing.Size(82, 23);
-            this.moveDownButton.TabIndex = 9;
+            this.moveDownButton.TabIndex = 14;
             this.moveDownButton.Text = "Move Down";
             this.moveDownButton.UseVisualStyleBackColor = true;
             this.moveDownButton.Click += new System.EventHandler(this.moveDownButton_Click);
@@ -319,10 +440,10 @@ namespace DeviceLister
             // hideSelectedButton
             //
             this.hideSelectedButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.hideSelectedButton.Location = new System.Drawing.Point(193, 575);
+            this.hideSelectedButton.Location = new System.Drawing.Point(193, 605);
             this.hideSelectedButton.Name = "hideSelectedButton";
             this.hideSelectedButton.Size = new System.Drawing.Size(92, 23);
-            this.hideSelectedButton.TabIndex = 10;
+            this.hideSelectedButton.TabIndex = 15;
             this.hideSelectedButton.Text = "Hide Selected";
             this.hideSelectedButton.UseVisualStyleBackColor = true;
             this.hideSelectedButton.Click += new System.EventHandler(this.hideSelectedButton_Click);
@@ -330,10 +451,10 @@ namespace DeviceLister
             // showSelectedButton
             //
             this.showSelectedButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.showSelectedButton.Location = new System.Drawing.Point(291, 575);
+            this.showSelectedButton.Location = new System.Drawing.Point(291, 605);
             this.showSelectedButton.Name = "showSelectedButton";
             this.showSelectedButton.Size = new System.Drawing.Size(96, 23);
-            this.showSelectedButton.TabIndex = 11;
+            this.showSelectedButton.TabIndex = 16;
             this.showSelectedButton.Text = "Show Selected";
             this.showSelectedButton.UseVisualStyleBackColor = true;
             this.showSelectedButton.Click += new System.EventHandler(this.showSelectedButton_Click);
@@ -341,10 +462,10 @@ namespace DeviceLister
             // showAllButton
             //
             this.showAllButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.showAllButton.Location = new System.Drawing.Point(393, 575);
+            this.showAllButton.Location = new System.Drawing.Point(393, 605);
             this.showAllButton.Name = "showAllButton";
             this.showAllButton.Size = new System.Drawing.Size(75, 23);
-            this.showAllButton.TabIndex = 12;
+            this.showAllButton.TabIndex = 17;
             this.showAllButton.Text = "Show All";
             this.showAllButton.UseVisualStyleBackColor = true;
             this.showAllButton.Click += new System.EventHandler(this.showAllButton_Click);
@@ -352,10 +473,10 @@ namespace DeviceLister
             // refreshButton
             //
             this.refreshButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.refreshButton.Location = new System.Drawing.Point(474, 575);
+            this.refreshButton.Location = new System.Drawing.Point(474, 605);
             this.refreshButton.Name = "refreshButton";
             this.refreshButton.Size = new System.Drawing.Size(101, 23);
-            this.refreshButton.TabIndex = 13;
+            this.refreshButton.TabIndex = 18;
             this.refreshButton.Text = "Refresh Devices";
             this.refreshButton.UseVisualStyleBackColor = true;
             this.refreshButton.Click += new System.EventHandler(this.refreshButton_Click);
@@ -363,10 +484,10 @@ namespace DeviceLister
             // copyButton
             //
             this.copyButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.copyButton.Location = new System.Drawing.Point(834, 575);
+            this.copyButton.Location = new System.Drawing.Point(934, 605);
             this.copyButton.Name = "copyButton";
             this.copyButton.Size = new System.Drawing.Size(94, 23);
-            this.copyButton.TabIndex = 14;
+            this.copyButton.TabIndex = 19;
             this.copyButton.Text = "Copy Details";
             this.copyButton.UseVisualStyleBackColor = true;
             this.copyButton.Click += new System.EventHandler(this.copyButton_Click);
@@ -375,17 +496,22 @@ namespace DeviceLister
             //
             this.statusLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.statusLabel.Location = new System.Drawing.Point(581, 552);
+            this.statusLabel.Location = new System.Drawing.Point(581, 582);
             this.statusLabel.Name = "statusLabel";
-            this.statusLabel.Size = new System.Drawing.Size(347, 17);
-            this.statusLabel.TabIndex = 15;
+            this.statusLabel.Size = new System.Drawing.Size(447, 17);
+            this.statusLabel.TabIndex = 20;
             this.statusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            //
+            // identifyTimer
+            //
+            this.identifyTimer.Interval = 150;
+            this.identifyTimer.Tick += new System.EventHandler(this.identifyTimer_Tick);
             //
             // DeviceListerForm
             //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(940, 610);
+            this.ClientSize = new System.Drawing.Size(1040, 640);
             this.Controls.Add(this.statusLabel);
             this.Controls.Add(this.copyButton);
             this.Controls.Add(this.refreshButton);
@@ -396,18 +522,26 @@ namespace DeviceLister
             this.Controls.Add(this.moveUpButton);
             this.Controls.Add(this.ignoredProcessesTextBox);
             this.Controls.Add(this.ignoredProcessesLabel);
+            this.Controls.Add(this.renameButton);
+            this.Controls.Add(this.aliasTextBox);
+            this.Controls.Add(this.aliasLabel);
             this.Controls.Add(this.visibleWhitelistCheckBox);
             this.Controls.Add(this.identifierComboBox);
             this.Controls.Add(this.identifierLabel);
+            this.Controls.Add(this.identifyGroupBox);
+            this.Controls.Add(this.previewGroupBox);
             this.Controls.Add(this.deviceListView);
             this.Controls.Add(this.targetGroupBox);
             this.Controls.Add(this.instructionsLabel);
-            this.MinimumSize = new System.Drawing.Size(860, 520);
+            this.MinimumSize = new System.Drawing.Size(940, 560);
             this.Name = "DeviceListerForm";
             this.Text = "devreorder Device Lister";
             this.Load += new System.EventHandler(this.DeviceListerForm_Load);
             this.targetGroupBox.ResumeLayout(false);
             this.targetGroupBox.PerformLayout();
+            this.previewGroupBox.ResumeLayout(false);
+            this.identifyGroupBox.ResumeLayout(false);
+            this.identifyGroupBox.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -417,6 +551,7 @@ namespace DeviceLister
 
         private System.Windows.Forms.Label instructionsLabel;
         private System.Windows.Forms.GroupBox targetGroupBox;
+        private System.Windows.Forms.Button importConfigButton;
         private System.Windows.Forms.Button refreshStatusButton;
         private System.Windows.Forms.Button saveAsButton;
         private System.Windows.Forms.Button saveTargetButton;
@@ -430,11 +565,20 @@ namespace DeviceLister
         private System.Windows.Forms.ListView deviceListView;
         private System.Windows.Forms.ColumnHeader orderColumnHeader;
         private System.Windows.Forms.ColumnHeader nameColumnHeader;
+        private System.Windows.Forms.ColumnHeader aliasColumnHeader;
         private System.Windows.Forms.ColumnHeader guidColumnHeader;
         private System.Windows.Forms.ColumnHeader deviceInstanceIdColumnHeader;
+        private System.Windows.Forms.GroupBox previewGroupBox;
+        private System.Windows.Forms.ListBox effectiveOrderListBox;
+        private System.Windows.Forms.GroupBox identifyGroupBox;
+        private System.Windows.Forms.TextBox identifyTextBox;
+        private System.Windows.Forms.Label identifyStatusLabel;
         private System.Windows.Forms.Label identifierLabel;
         private System.Windows.Forms.ComboBox identifierComboBox;
         private System.Windows.Forms.CheckBox visibleWhitelistCheckBox;
+        private System.Windows.Forms.Label aliasLabel;
+        private System.Windows.Forms.TextBox aliasTextBox;
+        private System.Windows.Forms.Button renameButton;
         private System.Windows.Forms.Label ignoredProcessesLabel;
         private System.Windows.Forms.TextBox ignoredProcessesTextBox;
         private System.Windows.Forms.Button moveUpButton;
@@ -445,5 +589,6 @@ namespace DeviceLister
         private System.Windows.Forms.Button refreshButton;
         private System.Windows.Forms.Button copyButton;
         private System.Windows.Forms.Label statusLabel;
+        private System.Windows.Forms.Timer identifyTimer;
     }
 }
